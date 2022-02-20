@@ -45,23 +45,23 @@ async function getBusLocations(){
 }
 
 var counter = [];
+
 async function run(){
     var locations = await getBusLocations();
     console.log(new Date());
     console.log(locations);
 
-    if(counter.length!=0){
-        for (var i = 0 ; i < counter.length; i++){ 
-			counter[i].remove();
-			}	
-    }
+    
+    for (var i = 0 ; i < counter.length; i++){ 
+		counter[i].remove();
+	}	
 
     counter = [];
 
 
-    locations.data.forEach(function(bus){
-		var lat = bus.attributes.latitude; 
-		var lng = bus.attributes.longitude; 
+    locations.data.forEach(function(x){
+		var lng = x.attributes.longitude;
+        var lat = x.attributes.latitude;  
 		
 		var marker = new mapboxgl.Marker()
       		.setLngLat([lng,lat])
