@@ -1,21 +1,79 @@
-<script>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Add a default marker</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.js"></script>
+<style>
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    .map-overlay{
+        position: absolute;
+        left: 0;
+        padding: 10px;
+    }
+</style>
+</head>
+<body>
 
+<div id="map"></div>
+<div class="map-overlay top">
+    <button style="font-size: 2em;" onclick="move()">
+        Buses on Route 111: Woodlawn - Haymarket Station
+    </button>
+</div>
+
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1Ijoidi12ZWxhIiwiYSI6ImNremVrcHU5MzAxZzUybm8zMGdiYnQwemcifQ.D5WQu01YcEqlCrw6SeXmOg';
+
+
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: [-71.0474, 42.3850],
+    zoom: 12
+});
+
+
+async function getBusLocations(){
+    const url = 'https://api-v3.mbta.com/vehicles?filter[route]=111&include=trip';
+    const response = await fetch(url);
+    const json = await response.json();
+    return json;
+}
+
+var counter = [];
 async function run(){
-    const locations = await getBusLocations();
+    var locations = await getBusLocations();
     console.log(new Date());
     console.log(locations);
 
-    //timer
-    setTimeout(run, 15000);
-}
+    if(counter.length!=0){
+        for (var i = 0 ; i < counter.length; i++){ 
+			counter[i].remove();
+			}	
+    }
 
-async function getBusLocations(){
-    const url = 'https://api-v3.mbta.com/vehicles?filter[route]=1&include=trip';
-    const response = await fetch(url);
-    const json = await response.json();
-    return json.data;
+    counter = [];
+
+
+    locations.data.forEach(function(bus){
+		var lat = bus.attributes.latitude; 
+		var lng = bus.attributes.longitude; 
+		
+		var marker = new mapboxgl.Marker()
+      		.setLngLat([lng,lat])
+      		.addTo(map);
+		    counter.push(marker);
+	});
+
+    setTimeout(run, 10000);
 }
 
 run();
-
 </script>
+ 
+</body>
+</html>
